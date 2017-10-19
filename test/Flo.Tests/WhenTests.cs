@@ -65,5 +65,27 @@ namespace Flo.Tests
             context.Count.ShouldBe(3);
             context.ContainsKey("Item3").ShouldBe(true);
         }
+
+        async Task it_can_execute_predicate_pipeline_implicitly()
+        {
+            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+                cfg.When(ctx => ctx.Count == 0, 
+                    builder => builder.Terminate(ctx => {
+                        ctx.Add("Item1", "Item1Value");
+                        return Task.CompletedTask;
+                    })
+                )
+                .Terminate(ctx => {
+                    ctx.Add("Item2", "Item2Value");
+                    return Task.CompletedTask;
+                })
+            );
+
+            var context = new Dictionary<string, object>();
+            await pipeline.Invoke(context);
+
+            context.Count.ShouldBe(2);
+            context.ContainsKey("Item1").ShouldBe(true);   
+        }
     }
 }
