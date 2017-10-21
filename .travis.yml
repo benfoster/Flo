@@ -1,7 +1,6 @@
 language: csharp
 sudo: false
-os:
-  - linux
-  - osx
+mono: none
+dotnet: 2.0.0
 script:
   - ./build.sh
