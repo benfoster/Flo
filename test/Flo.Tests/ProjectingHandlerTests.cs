@@ -32,6 +32,30 @@ namespace Flo.Tests
             input.Message.ShouldBe("dlrow olleh");
         }
 
+        async Task it_can_project_using_handler_type()
+        {
+            var pipeline = Pipeline.Build<Pipeline1Input>(cfg => 
+                cfg.Project<Pipeline2Input, Pipeline1Handler>(inner => inner.Add<Pipeline2Handler>())
+            );
+
+            var input = new Pipeline1Input { Message = "hello world" };
+            await pipeline.Invoke(input);
+
+            input.Message.ShouldBe("HELLO WORLD");
+        }
+
+        async Task it_can_project_to_output_handler_using_handler_type()
+        {
+            var pipeline = Pipeline.Build<Pipeline1Input>(cfg => 
+                cfg.Project<string, string, Pipeline1OutputHandler>(inner => inner.Add<Pipeline2OutputHandler>())
+            );
+
+            var input = new Pipeline1Input { Message = "hello world" };
+            await pipeline.Invoke(input);
+
+            input.Message.ShouldBe("dlrow olleh");
+        }
+
         class Pipeline1Input
         {
             public string Message {get;set;}

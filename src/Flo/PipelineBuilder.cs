@@ -7,8 +7,8 @@ namespace Flo
     public class PipelineBuilder<TInput> : Builder<TInput, Task>
     {
         private readonly Func<Type, object> _serviceProvider;
-        
-        public PipelineBuilder(Func<Type, object> serviceProvider = null) 
+
+        public PipelineBuilder(Func<Type, object> serviceProvider = null)
             : base(input => Task.CompletedTask)
         {
             _serviceProvider = serviceProvider ?? (type => Activator.CreateInstance(type));
@@ -96,7 +96,7 @@ namespace Flo
         {
             if (handler == null) throw new ArgumentNullException(nameof(handler));
             if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
-            
+
             return Add((input, next) =>
             {
                 var builder = new PipelineBuilder<TProjectedInput, TProjectedOutput>(_serviceProvider);
@@ -121,10 +121,10 @@ namespace Flo
         {
             if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
 
-            return Add((input, next) => 
+            return Add((input, next) =>
             {
                 var handler = handlerFactory.Invoke();
-                
+
                 if (handler != null)
                 {
                     return handler.HandleAsync(input, next);
@@ -134,12 +134,26 @@ namespace Flo
             });
         }
 
-        public PipelineBuilder<TInput> Project<TProjectedInput>(Func<IProjectingHandler<TInput, TProjectedInput>> handlerFactory, Action<PipelineBuilder<TProjectedInput>> configurePipeline) 
+        public PipelineBuilder<TInput> Project<TProjectedInput, THandler>(Action<PipelineBuilder<TProjectedInput>> configurePipeline)
+            where THandler : class, IProjectingHandler<TInput, TProjectedInput>
+        {
+            Func<THandler> handlerFactory = () => _serviceProvider.Invoke(typeof(THandler)) as THandler;
+            return Project(handlerFactory, configurePipeline);
+        }
+
+        public PipelineBuilder<TInput> Project<TProjectedInput, TProjectedOutput, THandler>(Action<PipelineBuilder<TProjectedInput, TProjectedOutput>> configurePipeline)
+            where THandler : class, IProjectingHandler<TInput, TProjectedInput, TProjectedOutput>
+        {
+            Func<THandler> handlerFactory = () => _serviceProvider.Invoke(typeof(THandler)) as THandler;
+            return Project(handlerFactory, configurePipeline);
+        }
+
+        public PipelineBuilder<TInput> Project<TProjectedInput>(Func<IProjectingHandler<TInput, TProjectedInput>> handlerFactory, Action<PipelineBuilder<TProjectedInput>> configurePipeline)
         {
             if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
             if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
 
-            return Project((input, pipeline, next) => 
+            return Project((input, pipeline, next) =>
             {
                 var handler = handlerFactory.Invoke();
 
@@ -153,13 +167,13 @@ namespace Flo
         }
 
         public PipelineBuilder<TInput> Project<TProjectedInput, TProjectedOutput>(
-            Func<IProjectingHandler<TInput, TProjectedInput, TProjectedOutput>> handlerFactory, 
-            Action<PipelineBuilder<TProjectedInput, TProjectedOutput>> configurePipeline) 
+            Func<IProjectingHandler<TInput, TProjectedInput, TProjectedOutput>> handlerFactory,
+            Action<PipelineBuilder<TProjectedInput, TProjectedOutput>> configurePipeline)
         {
             if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
             if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
 
-            return Project((input, pipeline, next) => 
+            return Project((input, pipeline, next) =>
             {
                 var handler = handlerFactory.Invoke();
 
