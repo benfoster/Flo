@@ -17,3 +17,7 @@ cache:
     - .packages
     - tools/Addins
     - tools/GitVersion.CommandLine
+
+deploy:
+  on:
+    tags: true
