@@ -1,6 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Flow based programming for .NET</Description>
+    <AssemblyTitle>Flo</AssemblyTitle>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <Authors>Ben Foster</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Flo</AssemblyName>
+    <PackageId>Flo</PackageId>
+    <PackageProjectUrl>https://github.com/benfoster/flo</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/benfoster/Flo/raw/master/LICENSE.MD</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/benfoster/flo</RepositoryUrl>
     <TargetFramework>netstandard1.3</TargetFramework>
   </PropertyGroup>
 
