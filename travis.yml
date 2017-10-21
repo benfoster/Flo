@@ -1,0 +1,7 @@
+language: csharp
+sudo: false
+os:
+  - linux
+  - osx
+script:
+  - ./build.sh
