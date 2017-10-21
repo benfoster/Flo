@@ -90,6 +90,39 @@ Task("__Pack")
         }
     });
 
+Task("__PublishNuget")
+    .WithCriteria(() => ShouldPublish(Context))
+    .Does(() => 
+    {
+        // // Resolve the API key.
+        var apiKey = EnvironmentVariable("NUGET_API_KEY");
+        if(string.IsNullOrEmpty(apiKey)) {
+            throw new InvalidOperationException("Could not resolve NuGet API key.");
+        }
+
+        // Resolve the API url.
+        var apiUrl = EnvironmentVariable("NUGET_API_URL");
+        if(string.IsNullOrEmpty(apiUrl)) {
+            throw new InvalidOperationException("Could not resolve NuGet API url.");
+        }
+
+        foreach(var package in GetFiles("./artifacts/*.nupkg"))
+        {
+            // Push the package.
+            NuGetPush(package.ToString(), new NuGetPushSettings {
+                ApiKey = apiKey,
+                Source = apiUrl
+            });
+        }
+    });
+
+private static bool ShouldPublish(ICakeContext context)
+{
+    // https://docs.travis-ci.com/user/environment-variables/#Convenience-Variables
+    return !context.BuildSystem().IsLocalBuild 
+        && !string.IsNullOrWhiteSpace(context.EnvironmentVariable("TRAVIS_TAG"));
+}
+
 Task("Build")
     .IsDependentOn("__Clean")
     .IsDependentOn("__Restore")
@@ -102,5 +135,9 @@ Task("Build")
 
 Task("Default")
     .IsDependentOn("Build");
+
+Task("Deploy")
+    .IsDependentOn("Build")
+    .IsDependentOn("__PublishNuget");
 
 RunTarget(target);

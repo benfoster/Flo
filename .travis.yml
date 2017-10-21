@@ -10,7 +10,7 @@ mono:
 dotnet: 2.0.0
 
 script:
-  - ./build.sh
+  - ./build.sh --target Deploy
 
 cache:
   directories:
