@@ -5,7 +5,6 @@
     <AssemblyTitle>Flo</AssemblyTitle>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <Authors>Ben Foster</Authors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Flo</AssemblyName>
     <PackageId>Flo</PackageId>
     <PackageProjectUrl>https://github.com/benfoster/flo</PackageProjectUrl>
