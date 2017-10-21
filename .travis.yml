@@ -4,9 +4,7 @@ language: csharp
 sudo: required
 dist: trusty
 
-mono:
-  - 4.4.2
-
+mono: none
 dotnet: 2.0.0
 
 script:
