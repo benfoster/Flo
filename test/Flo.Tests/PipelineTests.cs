@@ -10,7 +10,7 @@ namespace Flo.Tests
     {
         async Task it_can_execute_single_handler()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.Add((ctx, next) => {
                     ctx.Add("SomeKey", "SomeValue");
                     return Task.CompletedTask;
@@ -25,7 +25,7 @@ namespace Flo.Tests
 
         async Task it_can_execute_multiple_handlers()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.Add((ctx, next) => {
                     ctx.Add("Item1", "Item1Value");
                     return next.Invoke(ctx);
@@ -43,7 +43,7 @@ namespace Flo.Tests
             context["Item2"].ShouldBe("Item2Value");
         }
 
-        void it_can_execute_pipeline_with_return_result()
+        async Task it_can_execute_pipeline_with_return_result()
         {
             var pipeline = Pipeline.Build<string, char[]>(cfg =>
                 cfg.Add((input, next) => {
@@ -52,15 +52,15 @@ namespace Flo.Tests
                 })
                 .Add((input, next) => {
                     input += " world!";
-                    return input.Reverse().ToArray();
+                    return Task.FromResult(input.Reverse().ToArray());
                 })
             );
 
-            var chars = pipeline.Invoke("");
+            var chars = await pipeline.Invoke("");
             new string(chars).ShouldBe("!dlrow olleH");
         }
 
-        void it_returns_default_value_when_final_handler_is_not_set()
+        async Task it_returns_default_value_when_final_handler_is_not_set()
         {
             var pipeline = Pipeline.Build<int, int>(cfg =>
                 cfg.Add((input, next) => {
@@ -69,11 +69,11 @@ namespace Flo.Tests
                 })
             );    
 
-            var result = pipeline.Invoke(5);
+            var result = await pipeline.Invoke(5);
             result.ShouldBe(0); // default(int)
         }
 
-        void it_can_override_default_final_handler()
+        async Task it_can_override_default_final_handler()
         {
             var pipeline = Pipeline.Build<int, int>(cfg =>
                 cfg.Add((input, next) => {
@@ -84,10 +84,10 @@ namespace Flo.Tests
                     input = input * 2;
                     return next.Invoke(input);
                 })
-                .WithFinalHandler(output => output)
+                .WithFinalHandler(output => Task.FromResult(output))
             );    
 
-            var result = pipeline.Invoke(5);
+            var result = await pipeline.Invoke(5);
             result.ShouldBe(1000);
         }
     }

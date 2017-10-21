@@ -5,11 +5,11 @@ using Shouldly;
 
 namespace Flo.Tests
 {
-    public class describe_Pipeline_Terminate : nspec
+    class describe_Pipeline_Terminate : nspec
     {
         async Task it_terminates_the_pipeline_without_calling_next()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.Add((ctx, next) => {
                     ctx.Add("Item1", "Item1Value");
                     return next.Invoke(ctx);

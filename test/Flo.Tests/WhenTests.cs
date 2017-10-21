@@ -9,7 +9,7 @@ namespace Flo.Tests
     {
         async Task it_ignores_the_handler_if_the_predicate_returns_false()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.Add((ctx, next) => {
                     ctx.Add("Item1", "Item1Value");
                     return next.Invoke(ctx);
@@ -39,7 +39,7 @@ namespace Flo.Tests
 
         async Task it_executes_the_handler_if_the_predicate_returns_true()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.Add((ctx, next) => {
                     ctx.Add("Item1", "Item1Value");
                     return next.Invoke(ctx);
@@ -68,9 +68,9 @@ namespace Flo.Tests
 
         async Task it_can_execute_predicate_pipeline_implicitly()
         {
-            var pipeline = Pipeline.Build<Dictionary<string, object>, Task>(cfg =>
+            var pipeline = Pipeline.Build<Dictionary<string, object>>(cfg =>
                 cfg.When(ctx => ctx.Count == 0, 
-                    builder => builder.Terminate(ctx => {
+                    builder => builder.Add((ctx, next) => {
                         ctx.Add("Item1", "Item1Value");
                         return Task.CompletedTask;
                     })

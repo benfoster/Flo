@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NSpec;
 using Shouldly;
 
@@ -7,16 +8,16 @@ namespace Flo.Tests
 {
     class describe_Pipeline_Project : nspec
     {
-        void it_can_project_to_another_pipeline()
+        async Task it_can_project_to_another_pipeline()
         {
             var pipeline = Pipeline.Build<string, string>(cfg =>
                 cfg.Add((input, next) => {
                     input = input.ToUpper();
                     return next.Invoke(input);
                 })
-                .Project<char[], char[]>((input, projectedPipeline, next) 
+                .Project<char[], char[]>(async (input, projectedPipeline, next) 
                     => {
-                        var converted = projectedPipeline.Invoke(input.ToCharArray());
+                        var converted = await projectedPipeline.Invoke(input.ToCharArray());
                         return new string(converted);
                     },
                     builder => builder.Terminate(input => {
@@ -26,13 +27,13 @@ namespace Flo.Tests
                             if (input[i] != 'l' && input[i] != 'L')
                                 converted.Add(input[i]);
                         }
-                        return converted.ToArray();
+                        return Task.FromResult(converted.ToArray());
                     })
                 )
-                .WithFinalHandler(s => s)
+                .WithFinalHandler(s => Task.FromResult(s))
             );
 
-            var result = pipeline.Invoke("hello world");
+            var result = await pipeline.Invoke("hello world");
             result.ShouldBe("HEO WORD");
         }
     }
