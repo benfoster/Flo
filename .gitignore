@@ -265,9 +265,9 @@ __pycache__/
 *.pyc
 
 # Cake - Uncomment if you are using it
-# Pins a specific version of Cake by checking in the config
 tools/*
-!tools/packages.config
+# Pins a specific version of Cake by checking in the config
+#!tools/packages.config
 
 .DS_Store
 dump.rdb
