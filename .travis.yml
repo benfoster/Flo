@@ -1,6 +1,19 @@
 language: csharp
-sudo: false
-mono: none
+
+# .NET CLI require Ubuntu 14.04
+sudo: required
+dist: trusty
+
+mono:
+  - 4.4.2
+
 dotnet: 2.0.0
+
 script:
   - ./build.sh
+
+cache:
+  directories:
+    - .packages
+    - tools/Addins
+    - tools/GitVersion.CommandLine
