@@ -10,7 +10,7 @@ mono:
 dotnet: 2.0.0
 
 script:
-  - ./build.sh --target Deploy
+  - ./build.sh --verbosity diagnostic --target Deploy
 
 cache:
   directories:
