@@ -9,6 +9,9 @@ mono:
 
 dotnet: 2.0.0
 
+before_install:
+  - git fetch --unshallow # Travis always does a shallow clone, but GitVersion needs the full history including branches and tags
+
 script:
   - ./build.sh --verbosity diagnostic --target Deploy
 
