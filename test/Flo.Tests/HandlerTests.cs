@@ -54,7 +54,7 @@ namespace Flo.Tests
             output.ShouldBe("Override");        
         }
 
-        class TestHandler : IPipelineHandler<Dictionary<string, object>>
+        class TestHandler : IHandler<Dictionary<string, object>>
         {           
             public Task HandleAsync(Dictionary<string, object> input, Func<Dictionary<string, object>, Task> next)
             {
@@ -63,7 +63,7 @@ namespace Flo.Tests
             }
         }
 
-        class LazyHandler : IPipelineHandler<object>
+        class LazyHandler : IHandler<object>
         {
             private readonly Action _callback;
 
@@ -79,7 +79,7 @@ namespace Flo.Tests
             }
         }
 
-        class UpperHandler : IPipelineHandler<string, string>
+        class UpperHandler : IOutputHandler<string, string>
         {
             public Task<string> HandleAsync(string input, Func<string, Task<string>> next)
             {
@@ -88,7 +88,7 @@ namespace Flo.Tests
             }
         }
 
-        class OverridingHandler : IPipelineHandler<string, string>
+        class OverridingHandler : IOutputHandler<string, string>
         {
             private readonly string _output;
             

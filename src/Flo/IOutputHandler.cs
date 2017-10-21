@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Flo
 {
-    public interface IPipelineHandler<TInput, TOutput>
+    public interface IOutputHandler<TInput, TOutput>
     {
         Task<TOutput> HandleAsync(TInput input, Func<TInput, Task<TOutput>> next);
     }

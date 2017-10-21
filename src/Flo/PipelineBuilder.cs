@@ -111,13 +111,13 @@ namespace Flo
             return Add((input, next) => handler.Invoke(input));
         }
 
-        public PipelineBuilder<TInput> Add<THandler>() where THandler : class, IPipelineHandler<TInput>
+        public PipelineBuilder<TInput> Add<THandler>() where THandler : class, IHandler<TInput>
         {
             Func<THandler> handlerFactory = () => _serviceProvider.Invoke(typeof(THandler)) as THandler;
             return Add(handlerFactory);
         }
 
-        public PipelineBuilder<TInput> Add<THandler>(Func<THandler> handlerFactory) where THandler : IPipelineHandler<TInput>
+        public PipelineBuilder<TInput> Add(Func<IHandler<TInput>> handlerFactory)
         {
             if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
 
@@ -132,6 +132,44 @@ namespace Flo
 
                 return next.Invoke(input);
             });
+        }
+
+        public PipelineBuilder<TInput> Project<TProjectedInput>(Func<IProjectingHandler<TInput, TProjectedInput>> handlerFactory, Action<PipelineBuilder<TProjectedInput>> configurePipeline) 
+        {
+            if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
+            if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
+
+            return Project((input, pipeline, next) => 
+            {
+                var handler = handlerFactory.Invoke();
+
+                if (handler != null)
+                {
+                    return handler.HandleAsync(input, pipeline, next);
+                }
+
+                return next.Invoke(input);
+            }, configurePipeline);
+        }
+
+        public PipelineBuilder<TInput> Project<TProjectedInput, TProjectedOutput>(
+            Func<IProjectingHandler<TInput, TProjectedInput, TProjectedOutput>> handlerFactory, 
+            Action<PipelineBuilder<TProjectedInput, TProjectedOutput>> configurePipeline) 
+        {
+            if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
+            if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
+
+            return Project((input, pipeline, next) => 
+            {
+                var handler = handlerFactory.Invoke();
+
+                if (handler != null)
+                {
+                    return handler.HandleAsync(input, pipeline, next);
+                }
+
+                return next.Invoke(input);
+            }, configurePipeline);
         }
     }
 }

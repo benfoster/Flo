@@ -104,13 +104,13 @@ namespace Flo
             return this;
         }
 
-        public PipelineBuilder<TInput, TOutput> Add<THandler>() where THandler : class, IPipelineHandler<TInput, TOutput>
+        public PipelineBuilder<TInput, TOutput> Add<THandler>() where THandler : class, IOutputHandler<TInput, TOutput>
         {
             Func<THandler> handlerFactory = () => _serviceProvider.Invoke(typeof(THandler)) as THandler;
             return Add(handlerFactory);
         }
 
-        public PipelineBuilder<TInput, TOutput> Add<THandler>(Func<THandler> handlerFactory) where THandler : IPipelineHandler<TInput, TOutput>
+        public PipelineBuilder<TInput, TOutput> Add(Func<IOutputHandler<TInput, TOutput>> handlerFactory)
         {
             if (handlerFactory == null) throw new ArgumentNullException(nameof(handlerFactory));
 
