@@ -1,0 +1,11 @@
+# Build script
+build_script:
+  - ps: .\build.ps1 -Target "AppVeyor"
+
+# Tests
+test: off
+
+# Build cache
+cache:
+- tools -> build.cake
+- packages -> build.cake

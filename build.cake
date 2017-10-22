@@ -118,9 +118,11 @@ Task("__PublishNuget")
 
 private static bool ShouldPublish(ICakeContext context)
 {
-    // https://docs.travis-ci.com/user/environment-variables/#Convenience-Variables
-    return !context.BuildSystem().IsLocalBuild 
-        && !string.IsNullOrWhiteSpace(context.EnvironmentVariable("TRAVIS_TAG"));
+    var buildSystem = context.BuildSystem();
+
+    return buildSystem.AppVeyor.IsRunningOnAppVeyor
+        && buildSystem.AppVeyor.Environment.Repository.Tag.IsTag
+        && !string.IsNullOrWhiteSpace(buildSystem.AppVeyor.Environment.Repository.Tag.Name);
 }
 
 Task("Build")
@@ -136,7 +138,7 @@ Task("Build")
 Task("Default")
     .IsDependentOn("Build");
 
-Task("Deploy")
+Task("AppVeyor")
     .IsDependentOn("Build")
     .IsDependentOn("__PublishNuget");
 
