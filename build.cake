@@ -132,13 +132,10 @@ Task("Build")
     .IsDependentOn("__Test")
     .IsDependentOn("__Pack");
 
-// Task("Deploy")
-//     .IsDependentOn("Build");
-
 Task("Default")
     .IsDependentOn("Build");
 
-Task("AppVeyor")
+Task("Deploy")
     .IsDependentOn("Build")
     .IsDependentOn("__PublishNuget");
 

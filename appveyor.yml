@@ -1,10 +1,21 @@
-# Build script
-build_script:
-  - ps: .\build.ps1 -Target "AppVeyor"
+# common configuration for ALL branches
 
-# Tests
 test: off
-
-# Build cache
 cache:
 - tools -> build.cake
+
+# deploy on tagged branches only
+# build in Release mode and deploy to Azure
+-
+on:
+  appveyor_repo_tag: true
+
+build_script:
+  - ps: .\build.ps1 -Target "Deploy"
+
+
+# configuration for all other branches
+-
+
+build_script:
+  - ps: .\build.ps1
