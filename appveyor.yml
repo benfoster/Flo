@@ -4,18 +4,18 @@ test: off
 cache:
 - tools -> build.cake
 
-for:
+build_script:
+  - ps: .\build.ps1 -Target "Deploy"
 
-# deploy on tagged branches only
-# build in Release mode and deploy to Azure
--
-  skip_non_tags: true
-  build_script:
-    - ps: .\build.ps1 -Target "Deploy"
+artifacts:
+  - path: 'artifacts\*.nupkg'
 
-
-# configuration for all other branches
--
-  skip_tags: true
-  build_script:
-    - ps: .\build.ps1
+deploy:
+    # Deploy to GitHub Releases
+  - provider: GitHub
+    artifact: /.*\.nupkg/           # upload all NuGet packages to release assets
+    draft: false
+    prerelease: false
+    on:
+      branch: master                # release from master branch only
+      appveyor_repo_tag: true       # deploy on tag push only
