@@ -4,18 +4,18 @@ test: off
 cache:
 - tools -> build.cake
 
+for:
+
 # deploy on tagged branches only
 # build in Release mode and deploy to Azure
 -
-on:
-  appveyor_repo_tag: true
-
-build_script:
-  - ps: .\build.ps1 -Target "Deploy"
+  skip_non_tags: true
+  build_script:
+    - ps: .\build.ps1 -Target "Deploy"
 
 
 # configuration for all other branches
 -
-
-build_script:
-  - ps: .\build.ps1
+  skip_tags: true
+  build_script:
+    - ps: .\build.ps1
