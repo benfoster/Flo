@@ -9,6 +9,9 @@ mono:
 
 dotnet: 2.0.0
 
+# Ignore tagged commits
+if: tag IS blank
+
 script:
   - ./build.sh
 
