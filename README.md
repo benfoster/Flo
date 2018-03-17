@@ -214,4 +214,4 @@ All strongly typed handlers are lazily initialised to avoid unecessary overhead 
 
 ## More examples
 
-You can find more examples in the tests project. I've also started working on some more comprehensive examples modelling a payment gateway [here](https://github.com/benfoster/Flo/tree/sample).
+You can find more examples in the tests project. I've also started working on a more comprehensive example that demonstrates breaking up a payment gateway into pipelines [here](https://github.com/benfoster/Flo/tree/sample).
