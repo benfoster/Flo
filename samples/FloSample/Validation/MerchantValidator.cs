@@ -9,8 +9,7 @@ namespace FloSample
     {
         public async Task<ValidationResult> HandleAsync(
             RequestPayment command, 
-            Func<RequestPayment, Task<ValidationResult>> next, 
-            CancellationToken token)
+            Func<RequestPayment, Task<ValidationResult>> next)
         {
             if (command.MerchantId <= 0)
                 return new ValidationResult

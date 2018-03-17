@@ -56,7 +56,7 @@ namespace Flo.Tests
 
         class TestHandler : IHandler<TestContext>
         {           
-            public Task<TestContext> HandleAsync(TestContext input, Func<TestContext, Task<TestContext>> next, CancellationToken cancellationToken)
+            public Task<TestContext> HandleAsync(TestContext input, Func<TestContext, Task<TestContext>> next)
             {
                 input.Add(Guid.NewGuid().ToString(), Guid.NewGuid());
                 return next.Invoke(input);
@@ -72,7 +72,7 @@ namespace Flo.Tests
                 _callback = callback;
             }
             
-            public Task<object> HandleAsync(object input, Func<object, Task<object>> next, CancellationToken cancellationToken)
+            public Task<object> HandleAsync(object input, Func<object, Task<object>> next)
             {
                 _callback.Invoke();
                 return next.Invoke(input);
@@ -81,7 +81,7 @@ namespace Flo.Tests
 
         class StringLengthCountHandler : IHandler<string, int>
         {
-            public Task<int> HandleAsync(string input, Func<string, Task<int>> next, CancellationToken cancellationToken)
+            public Task<int> HandleAsync(string input, Func<string, Task<int>> next)
             {
                 return Task.FromResult(input.Length);
             }
@@ -98,7 +98,7 @@ namespace Flo.Tests
                 _output = output;
             }
             
-            public Task<string> HandleAsync(string input, Func<string, Task<string>> next, CancellationToken cancellationToken)
+            public Task<string> HandleAsync(string input, Func<string, Task<string>> next)
             {
                 return Task.FromResult("Override");
             }

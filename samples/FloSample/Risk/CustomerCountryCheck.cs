@@ -7,7 +7,7 @@ namespace FloSample
 {
     public class CustomerCountryCheck : IHandler<RiskContext>
     {
-        public Task<RiskContext> HandleAsync(RiskContext riskContext, Func<RiskContext, Task<RiskContext>> next, CancellationToken token)
+        public Task<RiskContext> HandleAsync(RiskContext riskContext, Func<RiskContext, Task<RiskContext>> next)
         {
             bool passed = true;
 

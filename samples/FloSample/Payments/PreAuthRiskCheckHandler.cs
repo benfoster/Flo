@@ -10,7 +10,7 @@ namespace FloSample
     /// </summary>
     public class PreAuthRiskCheckHandler : IHandler<RequestPayment, OneOf<PaymentCreated, PaymentAccepted, PaymentFailed>>
     {
-        public async Task<OneOf<PaymentCreated, PaymentAccepted, PaymentFailed>> HandleAsync(RequestPayment command, System.Func<RequestPayment, System.Threading.Tasks.Task<OneOf<PaymentCreated, PaymentAccepted, PaymentFailed>>> next, CancellationToken token)
+        public async Task<OneOf<PaymentCreated, PaymentAccepted, PaymentFailed>> HandleAsync(RequestPayment command, System.Func<RequestPayment, System.Threading.Tasks.Task<OneOf<PaymentCreated, PaymentAccepted, PaymentFailed>>> next)
         {
             var merchantAddress = await GetMerchantAddress(command.MerchantId);
 

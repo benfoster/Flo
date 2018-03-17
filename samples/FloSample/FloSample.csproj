@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="OneOf" Version="2.1.117"/>
-    <PackageReference Include="Flo" Version="0.2.0"/>
+    <PackageReference Include="Flo" Version="0.2.1"/>
     <PackageReference Include="nspec" Version="3.1.0"/>
     <PackageReference Include="Oakton" Version="1.4.0"/>
     <PackageReference Include="Moq" Version="4.8.2"/>

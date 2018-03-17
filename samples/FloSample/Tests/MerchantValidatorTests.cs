@@ -23,8 +23,7 @@ namespace FloSample.Tests
         {
             validationResult = await validator.HandleAsync(
                 command,
-                x => Task.FromResult(validationResult),
-                CancellationToken.None);
+                x => Task.FromResult(validationResult));
         }
 
         void given_merchant_id_is_less_than_0()
