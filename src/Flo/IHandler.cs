@@ -1,10 +1,15 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Flo
 {
-    public interface IHandler<TInput>
+    public interface IHandler<TIn, TOut>
     {
-        Task HandleAsync(TInput input, Func<TInput, Task> next);
+        Task<TOut> HandleAsync(TIn input, Func<TIn, Task<TOut>> next, CancellationToken token);
+    }
+    
+    public interface IHandler<T> : IHandler<T, T>
+    {
     }
 }
