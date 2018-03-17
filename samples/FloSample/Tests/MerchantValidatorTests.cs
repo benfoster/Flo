@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NSpec;
 using Shouldly;
 
-namespace FloSample
+namespace FloSample.Tests
 {
     class describe_merchant_validator : nspec
     {
