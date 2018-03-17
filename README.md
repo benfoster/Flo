@@ -210,6 +210,7 @@ var pipeline = Pipeline.Build<string, int>(cfg =>
 );
 
 All strongly typed handlers are lazily initialised to avoid unecessary overhead if a path in the pipeline is not hit.
+```
 
 ## More examples
 
