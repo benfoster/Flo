@@ -83,7 +83,7 @@ namespace Flo
                 
                 if (handler != null)
                 {
-                    return handler.HandleAsync(input, next, CancellationToken.None);
+                    return handler.HandleAsync(input, next);
                 }
 
                 return next.Invoke(input);
