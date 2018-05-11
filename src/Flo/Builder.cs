@@ -89,6 +89,12 @@ namespace Flo
                 return next.Invoke(input);
             });
         }
+
+        public TBuilder Add(IHandler<TIn, TOut> handler)
+        {
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            return Add((input, next) => handler.HandleAsync(input, next));
+        }
         
         public TBuilder Add(Func<TIn, Func<TIn, Task<TOut>>, Task<TOut>> handler)
         {

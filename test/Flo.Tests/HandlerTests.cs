@@ -21,10 +21,20 @@ namespace Flo.Tests
             context.Count.ShouldBe(2);
         }
 
+        async Task it_can_register_handler_instance()
+        {
+            var pipeline = Pipeline.Build<TestContext>(cfg =>
+                cfg.Add(new TestHandler()));
+
+            var context = new TestContext();
+            await pipeline.Invoke(context);
+            context.Count.ShouldBe(1);
+        }
+
         async Task it_initialises_handlers_lazily()
         {
             bool initialised = false;
-            
+
             var pipeline = Pipeline.Build<object>(cfg =>
                  cfg.Add(() => new LazyHandler(() => initialised = true))
             );
@@ -41,7 +51,7 @@ namespace Flo.Tests
             );
 
             var output = await pipeline.Invoke("hello world");
-            output.ShouldBe(11);                
+            output.ShouldBe(11);
         }
 
         async Task it_can_use_a_custom_service_provider()
@@ -51,11 +61,11 @@ namespace Flo.Tests
             , type => new OverridingHandler("Override")); // always returns this handler type
 
             var output = await pipeline.Invoke("hello world");
-            output.ShouldBe("Override");        
+            output.ShouldBe("Override");
         }
 
         class TestHandler : IHandler<TestContext>
-        {           
+        {
             public Task<TestContext> HandleAsync(TestContext input, Func<TestContext, Task<TestContext>> next)
             {
                 input.Add(Guid.NewGuid().ToString(), Guid.NewGuid());
@@ -71,7 +81,7 @@ namespace Flo.Tests
             {
                 _callback = callback;
             }
-            
+
             public Task<object> HandleAsync(object input, Func<object, Task<object>> next)
             {
                 _callback.Invoke();
@@ -90,14 +100,14 @@ namespace Flo.Tests
         class OverridingHandler : IHandler<string, string>
         {
             private readonly string _output;
-            
-            public OverridingHandler() : this("Default") {}
+
+            public OverridingHandler() : this("Default") { }
 
             public OverridingHandler(string output)
             {
                 _output = output;
             }
-            
+
             public Task<string> HandleAsync(string input, Func<string, Task<string>> next)
             {
                 return Task.FromResult("Override");
