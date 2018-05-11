@@ -154,8 +154,8 @@ You can add multiple handlers to the branched pipeline. For `Pipeline<T>` the pa
 
 1. `PaymentValidationHandler`
 2. `ThreeDsLoggingHandler`
-3. `ThreeDsHandler`
-4. `ThreeDsLoggingHandler`
+3. `ThreeDsLoggingHandler`
+4. `ThreeDsHandler`
 5. `ProcessingHandler`
 6. `PaymentValidationHandler`
 
