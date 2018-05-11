@@ -25,25 +25,32 @@ public class HttpContext
 Use `Pipeline.Build<T>` to create a pipeline passing in a configuration with the handlers you wish to add. Handlers can be delegates or strongly typed (see below). The `Build` method returns a `Func<T, Task<T>` or `Func<TIn, Func<Task<TOut>>` that can safely be reused in your application.
 
 ```c#
-var pipeline = Pipeline.Build<HttpContext>(cfg =>
-    cfg.Add((ctx, next) => {
+var pipeline = Pipeline.Build<HttpContext>(cfg =>Open Preview to Side
+    cfg.Add((ctx, next) => { // Handler 1
         Log.Logger.Info("Starting request to {path}", ctx.Request.Path);
         return next.Invoke(context);
     })
-    .Add((ctx, next) => {
+    .Add((ctx, next) => { // Handler 2
         if (!Validator.Validate(ctx.Request)) 
-		{
-			await ctx.Response.WriteAsync("invalid");
-			return;
-		}
-		
+        {
+            await ctx.Response.WriteAsync("invalid");
+            return ctx;
+        }
+        
         return next.Invoke(context);
+    })
+    .Add((ctx, next) => { // Handler 3
+        await ctx.Response.WriteAsync("Hello World");
+        return ctx;
     })
 );
 
 var context = new HttpContext { Path = "/foo" };
 context = await pipeline.Invoke(context);
 ```
+
+![Chain of responsibility pipeline](./docs/img/cop.svg)
+
 
 ### Strongly typed handlers
 
@@ -72,10 +79,10 @@ Strongly typed handlers are registered in the same way as delegate handlers:
 ```c#
 public static Func<RequestPayment, Task<ValidationResult>> Build()
 {
-	return Pipeline.Build<RequestPayment, ValidationResult>(cfg =>
-		cfg.Add<MerchantValidator>()
-		.Final(s => Task.FromResult(new ValidationResult { IsValid = true }))
-	);
+    return Pipeline.Build<RequestPayment, ValidationResult>(cfg =>
+        cfg.Add<MerchantValidator>()
+        .Final(s => Task.FromResult(new ValidationResult { IsValid = true }))
+    );
 }
 ```
 
@@ -87,14 +94,14 @@ For `Pipeline<T>` you do not need to do anything to mark the final handler as Fl
 
 ```c#
 var pipeline = Pipeline.Build<TestContext>(cfg =>
-	cfg.Add((ctx, next) => {
-		ctx.Add("Item1", "Item1Value");
-		return next.Invoke(ctx);
-	})
-	.Add((ctx, next) => {
-		ctx.Add("Item2", "Item2Value");
-		return next.Invoke(ctx); // no issue
-	})
+    cfg.Add((ctx, next) => {
+        ctx.Add("Item1", "Item1Value");
+        return next.Invoke(ctx);
+    })
+    .Add((ctx, next) => {
+        ctx.Add("Item2", "Item2Value");
+        return next.Invoke(ctx); // no issue
+    })
 );
 ```
 
@@ -102,17 +109,17 @@ With `Pipeline<TIn, TOut>` Flo can't automatically feed the final handler result
 
 ```c#
 var pipeline = Pipeline.Build<string, int>(cfg =>
-	cfg.Add((input, next) => {
-		input += "hello";
-		return next.Invoke(input);
-	})
-	.Add((input, next) => {
-		input += " world";
-		return next.Invoke(input);
-	})
-	.Add((input, next) => {
-		return Task.FromResult(input.Length); // don't call next
-	})
+    cfg.Add((input, next) => {
+        input += "hello";
+        return next.Invoke(input);
+    })
+    .Add((input, next) => {
+        input += " world";
+        return next.Invoke(input);
+    })
+    .Add((input, next) => {
+        return Task.FromResult(input.Length); // don't call next
+    })
 );
 ```
 
@@ -120,17 +127,17 @@ If you do, `default(TOut)` will be returned. A convenience method `Final` is als
 
 ```c#
 var pipeline = Pipeline.Build<string, int>(cfg =>
-	cfg.Add((input, next) => {
-		input += "hello";
-		return next.Invoke(input);
-	})
-	.Add((input, next) => {
-		input += " world";
-		return next.Invoke(input);
-	})
-	.Final(input => {
-		return Task.FromResult(input.Length); 
-	})
+    cfg.Add((input, next) => {
+        input += "hello";
+        return next.Invoke(input);
+    })
+    .Add((input, next) => {
+        input += " world";
+        return next.Invoke(input);
+    })
+    .Final(input => {
+        return Task.FromResult(input.Length); 
+    })
 );
 ```
 
@@ -140,13 +147,13 @@ var pipeline = Pipeline.Build<string, int>(cfg =>
 
 ```c#
 return Pipeline.Build<RequestPayment, PaymentResponse>(cfg =>
-	 cfg
-		.Add<PaymentValidationHandler>() 
-		.When(command => command.Is3ds, inner => 
-			inner.Add<ThreeDsLoggingHandler>() 
-			inner.Add<ThreeDsHandler>() 
-		)
-		.Add<ProcessingHandler>() 
+     cfg
+        .Add<PaymentValidationHandler>() 
+        .When(command => command.Is3ds, inner => 
+            inner.Add<ThreeDsLoggingHandler>() 
+            inner.Add<ThreeDsHandler>() 
+        )
+        .Add<ProcessingHandler>() 
 );
 ```
 
@@ -154,25 +161,27 @@ You can add multiple handlers to the branched pipeline. For `Pipeline<T>` the pa
 
 1. `PaymentValidationHandler`
 2. `ThreeDsLoggingHandler`
-3. `ThreeDsLoggingHandler`
-4. `ThreeDsHandler`
-5. `ProcessingHandler`
-6. `PaymentValidationHandler`
+3. `ThreeDsHandler`
+4. `ProcessingHandler`
+
+![When Pipeline](./docs/img/when.svg)
+
+The response is returned in the reverse order of execution.
 
 For `Pipeline<TIn, TOut>` we will only continue the parent pipeline if the inner pipeline does not return a result (`null`), for example:
 
 ```c#
 var pipeline = Pipeline.Build<TestContext, TestContext>(cfg =>
-	cfg.When(input => true,
-		builder => builder.Add((ctx, next) =>
-		{
-			return Task.FromResult(default(TestContext));
-		})
-	)
-	.Final(ctx => {
-		ctx.Add("Test", "TestValue");
-		return Task.FromResult(ctx);
-	})
+    cfg.When(input => true,
+        builder => builder.Add((ctx, next) =>
+        {
+            return Task.FromResult(default(TestContext));
+        })
+    )
+    .Final(ctx => {
+        ctx.Add("Test", "TestValue");
+        return Task.FromResult(ctx);
+    })
 );
 
 var result = await pipeline.Invoke(new TestContext());
@@ -188,8 +197,8 @@ Since the inner handler returned `null` we assume that we should continue on to 
 1. `PaymentValidationHandler`
 2. `ThreeDsLoggingHandler`
 3. `ThreeDsHandler`
-4. `ThreeDsLoggingHandler`
-5. `PaymentValidationHandler`
+
+![When Pipeline](./docs/img/fork.svg)
 
 ### Using an IoC Container 
 
@@ -197,8 +206,8 @@ By default Flo uses `Activator.CreateInstance` to create instances of your stron
 
 ```c#
 var pipeline = Pipeline.Build<string, string>(cfg =>
-	cfg.Add<OverridingHandler>()
-	,type => container.TryGetInstance(type) // use StructureMap container
+    cfg.Add<OverridingHandler>()
+    ,type => container.TryGetInstance(type) // use StructureMap container
 ); 
 ```
 
@@ -206,7 +215,7 @@ Alternatively you can provide a `Func<THandler>`:
 
 ```c#
 var pipeline = Pipeline.Build<string, int>(cfg =>
-	cfg.Add(() => new StringLengthCountHandler())
+    cfg.Add(() => new StringLengthCountHandler())
 );
 
 All strongly typed handlers are lazily initialised to avoid unecessary overhead if a path in the pipeline is not hit.
