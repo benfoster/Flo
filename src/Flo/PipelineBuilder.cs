@@ -24,6 +24,18 @@ namespace Flo
             configurePipeline);
         }
 
+        public PipelineBuilder<T> When(
+            Func<T, Task<bool>> predicate,
+            Action<PipelineBuilder<T>> configurePipeline)
+        {
+            return When(predicate, async (input, innerPipeline, next) =>
+            {
+                input = await innerPipeline.Invoke(input);
+                return await next.Invoke(input);
+            },
+            configurePipeline);
+        }
+
         protected override PipelineBuilder<T> CreateBuilder() => new PipelineBuilder<T>(ServiceProvider);
     }
 }

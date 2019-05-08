@@ -59,6 +59,29 @@ namespace Flo
             });
         }
 
+        public TBuilder When(
+            Func<TIn, Task<bool>> predicate,
+            Func<TIn, Func<TIn, Task<TOut>>, Func<TIn, Task<TOut>>, Task<TOut>> handler,
+            Action<TBuilder> configurePipeline)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            if (configurePipeline == null) throw new ArgumentNullException(nameof(configurePipeline));
+
+            return Add(async (input, next) =>
+            {
+                var doInvoke = await predicate.Invoke(input);
+                if (doInvoke)
+                {
+                    var builder = CreateBuilder();
+                    configurePipeline(builder);
+                    return await handler.Invoke(input, builder.Build(), next);
+                }
+
+                return await next.Invoke(input);
+            });
+        }
+
         protected abstract TBuilder CreateBuilder();
 
         public TBuilder Final(Func<TIn, Task<TOut>> handler)

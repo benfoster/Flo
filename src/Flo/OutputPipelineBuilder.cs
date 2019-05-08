@@ -31,6 +31,24 @@ namespace Flo
             configurePipeline);
         }
 
+        public OutputPipelineBuilder<TIn, TOut> When(
+            Func<TIn, Task<bool>> predicate,
+            Action<OutputPipelineBuilder<TIn, TOut>> configurePipeline,
+            Func<TOut, bool> continueIf = null)
+        {
+            return When(predicate, async (input, innerPipeline, next) =>
+            {
+                var result = await innerPipeline.Invoke(input);
+
+                // Continue on to the parent pipeline if the continueIf output predicate matches
+                if ((continueIf ?? DefaultContinuation).Invoke(result))
+                    return await next.Invoke(input);
+
+                return result;
+            },
+            configurePipeline);
+        }
+
         protected override OutputPipelineBuilder<TIn, TOut> CreateBuilder() => new OutputPipelineBuilder<TIn, TOut>(ServiceProvider);
     }
 }
