@@ -17,15 +17,15 @@ To create a pipeline similar to ASP.NET Core's middleware, first define the type
 ```c#
 public class HttpContext
 {
-    public HttpRequest Request {get;set;}
-    public HttpResponse Response {get;set;}
+    public HttpRequest Request { get;set; }
+    public HttpResponse Response { get;set; }
 }
 ```
 
 Use `Pipeline.Build<T>` to create a pipeline passing in a configuration with the handlers you wish to add. Handlers can be delegates or strongly typed (see below). The `Build` method returns a `Func<T, Task<T>` or `Func<TIn, Func<Task<TOut>>` that can safely be reused in your application.
 
 ```c#
-var pipeline = Pipeline.Build<HttpContext>(cfg =>Open Preview to Side
+var pipeline = Pipeline.Build<HttpContext>(cfg =>
     cfg.Add((ctx, next) => { // Handler 1
         Log.Logger.Info("Starting request to {path}", ctx.Request.Path);
         return next.Invoke(context);
